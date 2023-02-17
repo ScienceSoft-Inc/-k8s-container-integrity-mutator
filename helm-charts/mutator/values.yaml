@@ -15,12 +15,18 @@ replicaCount: 1 # number of replicas
 
 confName: ssl-k8s-webhook-injector # configuration name
 
+# TODO should be removed after implementation of helm based certificate generation
+serverCrt: "your certificate" # ssl key
+serverKey: "your key" # ssl certificate
+
 # cert and key file names referenced to corresponding config map keys with certificate and key
 serverCrtFile: server.crt
 serverKeyFile: server.key
 
 # Values for mutator-configuration
 sideCarConfig: /etc/sidecar/config/monitor-sidecar-config.yaml
+
+caBundle: "your CA certificate" # caBundle value
 
 path: "/mutate"
 

@@ -18,7 +18,39 @@ When applying a new scheme to a cluster, the application monitors the presence o
 ### Sequence diagram
 ![File location: docs/diagrams/mutatorSequenceDiagram.png](/docs/diagrams/mutatorSequenceDiagram.png?raw=true "Sequence diagram")
 ## :hammer: Installing components
+### Generate certificates
+Generate CA in /tmp :
+```
+cfssl gencert -initca ./certificates/tls/ca-csr.json | cfssljson -bare /tmp/ca
+```
 
+Generate private key and certificate for SSL connection:
+```
+cfssl gencert \
+-ca=/tmp/ca.pem \
+-ca-key=/tmp/ca-key.pem \
+-config=./certificates/tls/ca-config.json \
+-hostname="k8s-webhook-injector,k8s-webhook-injector.default.svc.cluster.local,k8s-webhook-injector.default.svc,localhost,127.0.0.1" \
+-profile=default \
+./certificates/tls/ca-csr.json | cfssljson -bare /tmp/k8s-webhook-injector
+```
+
+Move your SSL key and certificate to the ssl directory:
+```
+mv /tmp/k8s-webhook-injector.pem ./certificates/ssl/k8s-webhook-injector.pem
+mv /tmp/k8s-webhook-injector-key.pem ./certificates/ssl/k8s-webhook-injector.key
+```
+
+Update configuration data in the helm-charts/mutator/values.yaml file with your key in the appropriate field `serverKey` and certificate in the appropriate field `serverCrt`:
+```
+cat ./certificates/ssl/k8s-webhook-injector.key | base64 | tr -d '\n'
+cat ./certificates/ssl/k8s-webhook-injector.pem | base64 | tr -d '\n'
+```
+
+Update field `caBundle` value in the helm-charts/mutator/values.yaml file with your base64 encoded CA certificate:
+```
+cat /tmp/ca.pem | base64 | tr -d '\n'
+```
 ### Demo-app
 Here is a demo application in which a busybox container in `patch-json-command.json` is injected to a pod with an nginx container
 

@@ -1,18 +1,3 @@
-{{- $caPrefix := printf "%s-ca" .Release.Name }}
-{{- $ca := genCA $caPrefix 365 }}
-{{- $cn := .Release.Name }}
-{{- $altName := printf "%s.%s.svc" .Release.Name .Release.Namespace }}
-{{- $cert := genSignedCert $cn nil (list $altName) 365 $ca }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Values.confName }}
-  namespace: {{ .Release.Namespace }}
-data:
-  server.crt: {{ b64enc $cert.Cert }}
-  server.key: {{ b64enc $cert.Key }}
----
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -25,7 +10,7 @@ webhooks:
         name: {{ .Values.appName }}
         namespace: {{ .Release.Namespace }}
         path: {{ .Values.path }}
-      caBundle: {{ b64enc $ca.Cert }}
+      caBundle: {{ .Values.caBundle }}
     rules:
       - operations: [ "CREATE" ]
         apiGroups: [""]
