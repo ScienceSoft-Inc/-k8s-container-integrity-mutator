@@ -20,6 +20,7 @@ spec:
         app: {{ .Values.metadata.appName }}
       annotations:
         integrity-monitor.scnsoft.com/inject: "true"
+        integrity-monitor.scnsoft.com/process-image: {{ .Values.container.process }}={{ .Values.container.image }}
         {{ .Values.monitoringConfig.processName }}.integrity-monitor.scnsoft.com/monitoring-paths: {{ join "," .Values.monitoringConfig.mountPaths }}
     spec:
       serviceAccountName: {{ .Release.Name}}-{{ .Values.serviceAccount }}

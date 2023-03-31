@@ -3,7 +3,9 @@ package mutate
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -17,14 +19,31 @@ import (
 const (
 	AnnotationIntegrityMonitorInject = "integrity-monitor.scnsoft.com/inject"
 	AnnotationMonitoringPaths        = "integrity-monitor.scnsoft.com/monitoring-paths"
+	AnnotationProcessImage           = "integrity-monitor.scnsoft.com/process-image"
+
+	processImageRegexpStr = "^([^=,]+=[^=,]+,?)*$"
 )
+
+var (
+	ErrInvalidProcessImageFormat = errors.New("invalid process-image format")
+
+	processImageRegexp *regexp.Regexp
+)
+
+func init() {
+	regexp, err := regexp.Compile(processImageRegexpStr)
+	if err != nil {
+		panic(err)
+	}
+	processImageRegexp = regexp
+}
 
 func InjectIntegrityMonitor(logger *logrus.Logger, admReq *admissionv1.AdmissionRequest) (*admissionv1.AdmissionResponse, error) {
 	logger.Debug("processing request", admReq)
 	// check if valid pod resource
 	podResource := metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "pods"}
 	if admReq.Resource != podResource {
-		return nil, fmt.Errorf("Receive unexpected resource type: %s", admReq.Resource.Resource)
+		return nil, fmt.Errorf("receive unexpected resource type: %s", admReq.Resource.Resource)
 	}
 
 	admissionResponse := admissionv1.AdmissionResponse{
@@ -89,9 +108,19 @@ func checkAnnotations(annotations map[string]string) error {
 	if _, ok := annotations[AnnotationIntegrityMonitorInject]; !ok {
 		missedAnnotations = append(missedAnnotations, AnnotationIntegrityMonitorInject)
 	}
+
+	ok, err := checkProcessImage(annotations)
+	if err != nil {
+		return fmt.Errorf("invalid process-image: %w", err)
+	}
+	if !ok {
+		missedAnnotations = append(missedAnnotations, AnnotationProcessImage)
+	}
+
 	if ok := checkPathsAnnotations(annotations); !ok {
 		missedAnnotations = append(missedAnnotations, AnnotationMonitoringPaths)
 	}
+
 	if len(missedAnnotations) > 0 {
 		return fmt.Errorf("one ore more required annotations are missed %q", strings.Join(missedAnnotations, ","))
 	}
@@ -107,4 +136,14 @@ func checkPathsAnnotations(annotations map[string]string) (found bool) {
 	}
 
 	return found
+}
+
+func checkProcessImage(annotations map[string]string) (bool, error) {
+	if annocation, ok := annotations[AnnotationProcessImage]; ok {
+		if !processImageRegexp.MatchString(annocation) {
+			return false, ErrInvalidProcessImageFormat
+		}
+		return true, nil
+	}
+	return false, nil
 }

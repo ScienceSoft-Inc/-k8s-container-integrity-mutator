@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	monitoringOpts = "monitoring-options"
+	monitoringOptsArg = "monitoring-options"
+	processImageArg   = "process-image"
 )
 
 // SidecarConfig for sidecar parameters.
@@ -92,6 +93,10 @@ func (sc *SidecarConfig) ConfigFromAnnotations(annotations map[string]string) {
 				}
 			}
 		}
-		sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", monitoringOpts, strings.Join(opts, " ")))
+		sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", monitoringOptsArg, strings.Join(opts, " ")))
+
+		if annotation, ok := annotations[AnnotationProcessImage]; ok {
+			sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", processImageArg, annotation))
+		}
 	}
 }
