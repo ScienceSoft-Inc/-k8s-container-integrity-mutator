@@ -34,12 +34,13 @@ func TestSidecarConfig_ConfigFromAnnotations(t *testing.T) {
 			args: args{
 				annotations: map[string]string{
 					AnnotationIntegrityMonitorInject:                   "true",
+					AnnotationProcessImage:                             "nginx=nginx:latest",
 					fmt.Sprintf("nginx.%s", AnnotationMonitoringPaths): "/proc,/dir1, dir2",
 					fmt.Sprintf("redis.%s", AnnotationMonitoringPaths): "/proc, /dir1,dir2",
 					"unneeded-annotation":                              "value",
 				},
 			},
-			want: []string{"--testpar1=1", "--testpar2=2", "--monitoring-options='nginx=/proc,/dir1,dir2 redis=/proc,/dir1,dir2'"},
+			want: []string{"--testpar1=1", "--testpar2=2", "--monitoring-options=nginx=/proc,/dir1,dir2 redis=/proc,/dir1,dir2", "--process-image=nginx=nginx:latest"},
 		},
 	}
 	for _, tt := range tests {

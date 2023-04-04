@@ -7,6 +7,7 @@
 container:
   name: nginx # Container name
   image: nginx:latest # Container image that you deploy to the cluster
+  process: nginx # Main process in container
 
 # Name and identifier variables
 metadata:
