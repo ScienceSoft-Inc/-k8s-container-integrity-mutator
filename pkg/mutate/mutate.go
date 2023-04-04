@@ -31,11 +31,7 @@ var (
 )
 
 func init() {
-	regexp, err := regexp.Compile(processImageRegexpStr)
-	if err != nil {
-		panic(err)
-	}
-	processImageRegexp = regexp
+	processImageRegexp = regexp.MustCompile(processImageRegexpStr)
 }
 
 func InjectIntegrityMonitor(logger *logrus.Logger, admReq *admissionv1.AdmissionRequest) (*admissionv1.AdmissionResponse, error) {
@@ -139,8 +135,8 @@ func checkPathsAnnotations(annotations map[string]string) (found bool) {
 }
 
 func checkProcessImage(annotations map[string]string) (bool, error) {
-	if annocation, ok := annotations[AnnotationProcessImage]; ok {
-		if !processImageRegexp.MatchString(annocation) {
+	if annotation, ok := annotations[AnnotationProcessImage]; ok {
+		if !processImageRegexp.MatchString(annotation) {
 			return false, ErrInvalidProcessImageFormat
 		}
 		return true, nil
