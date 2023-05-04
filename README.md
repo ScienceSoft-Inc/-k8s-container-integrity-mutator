@@ -42,11 +42,23 @@ To work properly, you first need to set the configuration files:
 + values in the file `helm-charts/integrity-injector/values.yaml`
 + values in the file `helm-charts/demo-app-to-inject/values.yaml`
 
+Configuring monitored app at annotations:
+* `integrity-monitor.scnsoft.com/inject: "true"` - The sidecar injection annotation. If true, sidecar will be injected.
+* `<monitoring process name>.integrity-monitor.scnsoft.com/monitoring-paths: etc/nginx,usr/bin` - This annotation introduces a process to be monitored and specifies its paths.
+* `template:shareProcessNamespace: true`
+
 Build docker image:
 
 ```
 make docker
 ```
+
+## Troubleshooting
+
+Sometimes you may find that pod is injected with sidecar container as expected, check the following items:
+
+1) The pod is in running state with `integrity` sidecar container injected and no error logs.
+2) Check if the application pod has the correct annotations as described above.
 
 ### Run helm-charts
 
