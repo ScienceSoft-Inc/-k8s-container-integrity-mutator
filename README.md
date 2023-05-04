@@ -11,9 +11,6 @@
 
 This application provides the injection of any patch inside any k8s schemas like sidecar.
 
-When applying a new scheme to a cluster, the application monitors the presence of a "
-hasher-certificates-injector-sidecar" label and, if available, makes a patch.
-
 ## Architecture
 
 ### Statechart diagram
@@ -26,7 +23,7 @@ hasher-certificates-injector-sidecar" label and, if available, makes a patch.
 
 ## :hammer: Installing components
 
-### Running locally
+### Running minikube
 
 The code only works running inside a pod in Kubernetes.
 You need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster.
@@ -44,13 +41,6 @@ To work properly, you first need to set the configuration files:
 
 + values in the file `helm-charts/integrity-injector/values.yaml`
 + values in the file `helm-charts/demo-app-to-inject/values.yaml`
-
-In order to use make targets to lunch integrity-injector with/without demo app, following environment variables should be set:
-
-- DB_PASSWORD
-- DB_USER
-- DB_NAME
-- RELEASE_NAME_DB
 
 Build docker image:
 
@@ -73,19 +63,12 @@ helm install mutator helm-charts/integrity-injector
 ```
 
 Install helm chart with demo app
-install with db
-
-```
-make helm-demo-with-db
-```
-
-install without db
 
 ```
 make helm-demo
 ```
 
-Install demo with db and syslog server
+Install demo and syslog server
 
 ```
 make helm-demo-full
