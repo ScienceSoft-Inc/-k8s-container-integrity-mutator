@@ -14,18 +14,6 @@ IMAGE_VERSION ?= $(GIT_COMMIT)
 # helm chart path
 HELM_CHART_PATH := helm-charts
 
-## Downloads the Go module.
-.PHONY : mod-download
-mod-download:
-	@echo "==> Downloading Go module"
-	go mod download
-
-## Downloads the necessesary dev dependencies.
-.PHONY : dev-dependencies
-dev-dependencies: minikube update docker helm-all
-	@echo "==> Downloaded development dependencies"
-	@echo "==> Successfully installed"
-
 .PHONY : docker
 docker:
 	@eval $$(minikube docker-env) ;\

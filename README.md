@@ -26,26 +26,21 @@ hasher-certificates-injector-sidecar" label and, if available, makes a patch.
 
 ## :hammer: Installing components
 
-### Demo-app
+### Running locally
 
-Here is a demo application in which a busybox container in `patch-json-command.json` is injected to a pod with an nginx
-container
+The code only works running inside a pod in Kubernetes.
+You need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster.
+If you do not already have a cluster, you can create one by using `minikube`.
+Example <https://minikube.sigs.k8s.io/docs/start/>
 
-Build docker images mutator:
-
-```
-eval $(minikube docker-env)
-docker build -t mutator .
-```
-
-## Install Helm
+### Install Helm
 
 Before using helm charts you need to install helm on your local machine.  
 You can find the necessary installation information at this link https://helm.sh/docs/intro/install/
 
 ### Configuration
 
-To work properly, you first need to sett the configuration files:
+To work properly, you first need to set the configuration files:
 
 + values in the file `helm-charts/integrity-injector/values.yaml`
 + values in the file `helm-charts/demo-app-to-inject/values.yaml`
@@ -56,6 +51,12 @@ In order to use make targets to lunch integrity-injector with/without demo app, 
 - DB_USER
 - DB_NAME
 - RELEASE_NAME_DB
+
+Build docker image:
+
+```
+make docker
+```
 
 ### Run helm-charts
 
@@ -84,7 +85,7 @@ install without db
 make helm-demo
 ```
 
-install demo with db and syslog server
+Install demo with db and syslog server
 
 ```
 make helm-demo-full
