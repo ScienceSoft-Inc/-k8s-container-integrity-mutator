@@ -11,9 +11,6 @@
 
 This application provides the injection of any patch inside any k8s schemas like sidecar.
 
-When applying a new scheme to a cluster, the application monitors the presence of a "
-hasher-certificates-injector-sidecar" label and, if available, makes a patch.
-
 ## Architecture
 
 ### Statechart diagram
@@ -26,36 +23,42 @@ hasher-certificates-injector-sidecar" label and, if available, makes a patch.
 
 ## :hammer: Installing components
 
-### Demo-app
+### Running minikube
 
-Here is a demo application in which a busybox container in `patch-json-command.json` is injected to a pod with an nginx
-container
+The code only works running inside a pod in Kubernetes.
+You need to have a Kubernetes cluster, and the kubectl command-line tool must be configured to communicate with your cluster.
+If you do not already have a cluster, you can create one by using `minikube`.
+Example <https://minikube.sigs.k8s.io/docs/start/>
 
-Build docker images mutator:
-
-```
-eval $(minikube docker-env)
-docker build -t mutator .
-```
-
-## Install Helm
+### Install Helm
 
 Before using helm charts you need to install helm on your local machine.  
 You can find the necessary installation information at this link https://helm.sh/docs/intro/install/
 
 ### Configuration
 
-To work properly, you first need to sett the configuration files:
+To work properly, you first need to set the configuration files:
 
 + values in the file `helm-charts/integrity-injector/values.yaml`
 + values in the file `helm-charts/demo-app-to-inject/values.yaml`
 
-In order to use make targets to lunch integrity-injector with/without demo app, following environment variables should be set:
+Configuring monitored app at annotations:
+* `integrity-monitor.scnsoft.com/inject: "true"` - The sidecar injection annotation. If true, sidecar will be injected.
+* `<monitoring process name>.integrity-monitor.scnsoft.com/monitoring-paths: etc/nginx,usr/bin` - This annotation introduces a process to be monitored and specifies its paths.
+* `template:shareProcessNamespace: true`
 
-- DB_PASSWORD
-- DB_USER
-- DB_NAME
-- RELEASE_NAME_DB
+Build docker image:
+
+```
+make docker
+```
+
+## Troubleshooting
+
+Sometimes you may find that pod is injected with sidecar container as expected, check the following items:
+
+1) The pod is in running state with `integrity` sidecar container injected and no error logs.
+2) Check if the application pod has the correct annotations as described above.
 
 ### Run helm-charts
 
@@ -72,19 +75,12 @@ helm install mutator helm-charts/integrity-injector
 ```
 
 Install helm chart with demo app
-install with db
-
-```
-make helm-demo-with-db
-```
-
-install without db
 
 ```
 make helm-demo
 ```
 
-install demo with db and syslog server
+Install demo and syslog server
 
 ```
 make helm-demo-full

@@ -1,10 +1,8 @@
 BINARY_NAME := mutator_app
 APP_NAME := mutator
 DEMO_NAME := demo
-RELEASE_NAME_DB ?= db
-POSTGRES_SERVICE ?= $(RELEASE_NAME_DB)-postgresql
 NAMESPACE ?= default
-RELEASE_NAME_SYSLOG = rsyslog
+RELEASE_NAME_SYSLOG ?= rsyslog
 SYSLOG_ENABLED ?= false
 
 IMAGE_NAME ?= integrity-injector
@@ -14,20 +12,15 @@ IMAGE_VERSION ?= $(GIT_COMMIT)
 # helm chart path
 HELM_CHART_PATH := helm-charts
 
-## Downloads the Go module.
-.PHONY : mod-download
-mod-download:
-	@echo "==> Downloading Go module"
-	go mod download
-
-## Downloads the necessesary dev dependencies.
-.PHONY : dev-dependencies
-dev-dependencies: minikube update docker helm-all
-	@echo "==> Downloaded development dependencies"
-	@echo "==> Successfully installed"
+# Downloads the Go module.
+.PHONY : vendor
+vendor:
+	@echo "==> Downloading vendor"
+	go mod tidy
+	go mod vendor
 
 .PHONY : docker
-docker:
+docker: vendor
 	@eval $$(minikube docker-env) ;\
     docker build -t $(IMAGE_NAME):latest  -t $(IMAGE_NAME):$(IMAGE_VERSION) -f Dockerfile .
 
@@ -52,17 +45,6 @@ helm-demo:
 		--create-namespace \
 		$(HELM_CHART_PATH)/demo-app-to-inject
 
-helm-demo-with-db:
-	@helm upgrade -i ${DEMO_NAME} \
-		--namespace=$(NAMESPACE) \
-		--create-namespace \
-		--set global.postgresql.auth.database=$(DB_NAME) \
-		--set global.postgresql.auth.username=$(DB_USER) \
-		--set global.postgresql.auth.password=$(DB_PASSWORD) \
-		--set postgresql.enabled=true \
-		--set postgresql.fullnameOverride=$(POSTGRES_SERVICE) \
-		$(HELM_CHART_PATH)/demo-app-to-inject
-
 helm-demo-full:
 	@if [ $(SYSLOG_ENABLED) = "false" ]; then\
         echo SYSLOG_ENABLED ENV is false please set to true;\
@@ -71,11 +53,6 @@ helm-demo-full:
 	@helm upgrade -i ${DEMO_NAME} \
 		--namespace=$(NAMESPACE) \
 		--create-namespace \
-		--set global.postgresql.auth.database=$(DB_NAME) \
-		--set global.postgresql.auth.username=$(DB_USER) \
-		--set global.postgresql.auth.password=$(DB_PASSWORD) \
-		--set postgresql.enabled=true \
-		--set postgresql.fullnameOverride=$(POSTGRES_SERVICE) \
 		--set rsyslog.enabled=$(SYSLOG_ENABLED) \
 		--set rsyslog.fullnameOverride=$(RELEASE_NAME_SYSLOG) \
 		$(HELM_CHART_PATH)/demo-app-to-inject
