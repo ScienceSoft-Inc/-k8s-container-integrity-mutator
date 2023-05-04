@@ -29,27 +29,12 @@ helm-mutator:
 	@helm upgrade -i ${APP_NAME} \
 		--namespace=$(NAMESPACE) \
 		--create-namespace \
-		--set sideCar.secretName=$(POSTGRES_SERVICE) \
-		--set sideCar.db.host=$(POSTGRES_SERVICE) \
-		--set sideCar.db.name=$(DB_NAME) \
-		--set sideCar.db.username=$(DB_USER) \
-		--set sideCar.db.password=$(DB_PASSWORD) \
 		--set image.repository=$(IMAGE_NAME)    \
 		--set image.tag=$(IMAGE_VERSION) \
 		--set sideCar.syslog.enabled=$(SYSLOG_ENABLED) \
 		$(HELM_CHART_PATH)/$(IMAGE_NAME)
 
 helm-demo:
-	@helm upgrade -i ${DEMO_NAME} \
-		--namespace=$(NAMESPACE) \
-		--create-namespace \
-		$(HELM_CHART_PATH)/demo-app-to-inject
-
-helm-demo-full:
-	@if [ $(SYSLOG_ENABLED) = "false" ]; then\
-        echo SYSLOG_ENABLED ENV is false please set to true;\
-        exit 1;\
-    fi
 	@helm upgrade -i ${DEMO_NAME} \
 		--namespace=$(NAMESPACE) \
 		--create-namespace \
