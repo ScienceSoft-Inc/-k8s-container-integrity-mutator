@@ -6,7 +6,7 @@
 # Container image variables
 container:
   name: nginx # Container name
-  image: nginx:latest # Container image that you deploy to the cluster
+  image: nginx:1.24.0 # Container image that you deploy to the cluster
   process: nginx # Main process in container
 
 # Name and identifier variables
@@ -15,30 +15,10 @@ metadata:
   appName: nginx-app # Application name label
 
 # Name of Container Monitor App service account
-serviceAccount: hasher # Service account name
+serviceAccount: integrity # Service account name
 
 # Number of replicas
 replicaCount: 1
-
-# deploys the postgresql chart alongside demo app
-postgresql:
-  enabled: false
-  primary:
-    persistence:
-      # Enable PostgreSQL Primary data persistence using PVC
-      enabled: true
-      existingClaim: ""
-      # mountPath: /bitnami/postgresql - default mountPath
-      accessModes:
-        - ReadWriteOnce
-      size: 1Gi
-  fullnameOverride: "db-postgresql"
-  global:
-    postgresql:
-      auth:
-        username: "test"
-        password: "test"
-        database: ""
 
 rsyslog:
   enabled: false
@@ -46,5 +26,5 @@ rsyslog:
 monitoringConfig:
   processName: nginx # Container process name
   mountPaths: # Paths to monitoring
-    - etc/nginx
+    - bin
     - usr/bin

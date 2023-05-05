@@ -11,6 +11,9 @@
 
 This application provides the injection of any patch inside any k8s schemas like sidecar.
 
+When applying a new scheme to a cluster, the application monitors the presence of a "
+integrity-certificates-injector-sidecar" label and, if available, makes a patch.
+
 ## Architecture
 
 ### Statechart diagram

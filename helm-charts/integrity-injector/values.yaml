@@ -81,7 +81,6 @@ sideCar:
     proto: "tcp"
   durationTime: 30s # may be pollInterval will be more descriptive
   workers: 4
-  procDir: /proc
   algorithm: SHA256
   liveness:
     appName: integritySum
