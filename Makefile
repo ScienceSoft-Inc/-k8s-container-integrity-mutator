@@ -3,6 +3,8 @@ APP_NAME := mutator
 DEMO_NAME := demo
 NAMESPACE ?= default
 RELEASE_NAME_SYSLOG ?= rsyslog
+SYSLOG_HOST ?= $(RELEASE_NAME_SYSLOG)
+SYSLOG_PORT ?= 514
 SYSLOG_ENABLED ?= false
 
 IMAGE_NAME ?= integrity-injector
@@ -10,7 +12,8 @@ GIT_COMMIT := $(shell git describe --tags --long --dirty=-unsupported --always |
 IMAGE_VERSION ?= $(GIT_COMMIT)
 
 # helm chart path
-HELM_CHART_PATH := helm-charts
+HELM_CHART_PATH   := helm-charts
+HELM_CHART_SYSLOG := helm-charts/rsyslog
 
 # Downloads the Go module.
 .PHONY : vendor
@@ -32,6 +35,8 @@ helm-mutator:
 		--set image.repository=$(IMAGE_NAME)    \
 		--set image.tag=$(IMAGE_VERSION) \
 		--set sideCar.syslog.enabled=$(SYSLOG_ENABLED) \
+		--set sideCar.syslog.host=$(SYSLOG_HOST) \
+		--set sideCar.syslog.port=$(SYSLOG_PORT) \
 		$(HELM_CHART_PATH)/$(IMAGE_NAME)
 
 helm-demo:
@@ -39,8 +44,13 @@ helm-demo:
 		--namespace=$(NAMESPACE) \
 		--create-namespace \
 		--set rsyslog.enabled=$(SYSLOG_ENABLED) \
-		--set rsyslog.fullnameOverride=$(RELEASE_NAME_SYSLOG) \
 		$(HELM_CHART_PATH)/demo-app-to-inject
+
+helm-syslog:
+	helm upgrade -i ${RELEASE_NAME_SYSLOG} \
+		--set fullnameOverride=$(SYSLOG_HOST) \
+		--set service.port=$(SYSLOG_PORT) \
+		$(HELM_CHART_SYSLOG) --wait
 
 .PHONY : tidy
 tidy: ## Cleans the Go module.
