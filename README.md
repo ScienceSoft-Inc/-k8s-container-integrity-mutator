@@ -63,7 +63,40 @@ Sometimes you may find that pod is injected with sidecar container as expected, 
 1) The pod is in running state with `integrity` sidecar container injected and no error logs.
 2) Check if the application pod has the correct annotations as described above.
 
-### Run helm-charts
+### Install integrity injector, demo application and dependencies 
+
+Enable `syslog` support for `demo` application. *Optional*. 
+
+In order to enable `syslog` support env `SYSLOG_ENABLED` should be set to `true`
+
+```
+export SYSLOG_ENABLED=true
+```
+
+Configure `syslog` service, host and port
+
+By default, syslog host name is a name of local syslog service `rsyslog`, to change it,
+desired host name should be set to `SYSLOG_HOST` env.
+
+e.g.
+
+```
+export SYSLOG_HOST=desired-host-name
+```
+
+To specify custom `syslog` port, set `SYSLOG_PORT`, default port is 514
+
+e.g.
+
+```
+export SYSLOG_PORT=514
+```
+
+Install local `syslog` server. *Optional*
+
+```
+make helm-syslog
+```
 
 Install helm chart with mutator app
 
@@ -81,12 +114,6 @@ Install helm chart with demo app
 
 ```
 make helm-demo
-```
-
-Install demo and syslog server
-
-```
-make helm-demo-full
 ```
 
 or through helm
