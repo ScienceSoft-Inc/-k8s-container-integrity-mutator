@@ -39,6 +39,12 @@ func (sc *SidecarConfig) Load(configFile string, annotations map[string]string) 
 	}
 
 	sc.ConfigFromAnnotations(annotations)
+	sData, err := ReadMinIOSecret()
+	if err != nil {
+		return err
+	}
+	_ = sData
+	// sc.addMinIOCredentials(sData)
 
 	return nil
 }
