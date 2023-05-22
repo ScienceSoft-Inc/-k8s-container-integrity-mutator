@@ -13,16 +13,16 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-// SecretData contains the data from the MinIO secret
-type SecretData struct {
+// MinIOSecretData contains the data from the MinIO secret
+type MinIOSecretData struct {
 	// TODO: support encoding (base64)
 	UserName     string
 	UserPassword string
 }
 
 // ReadMinIOSecret reads the data from the MinIO secret and returns it as a
-// SecretData
-func ReadMinIOSecret() (*SecretData, error) {
+// MinIOSecretData
+func ReadMinIOSecret() (*MinIOSecretData, error) {
 	// Use the in-cluster config to create the clientSet
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -63,7 +63,7 @@ func ReadMinIOSecret() (*SecretData, error) {
 		// "password": string(password),
 	}).Info("ReadMinIOSecret()")
 
-	return &SecretData{
+	return &MinIOSecretData{
 		UserName:     string(username),
 		UserPassword: string(password),
 	}, nil

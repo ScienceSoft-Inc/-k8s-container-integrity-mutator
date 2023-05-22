@@ -94,3 +94,18 @@ linux-64bit:
 MacOS:
 	echo "Building for MacOS X 64-bit"
 	GOOS=darwin GOARCH=amd64 go build -o bin/${BINARY_NAME}_macos cmd/main.go
+
+.PHONY: kind-load-images
+kind-load-images:
+	@kind load docker-image $(IMAGE_NAME):$(IMAGE_VERSION)
+
+.PHONY: uninstall-all
+uninstall-all: uninstall-mutator uninstall-demo
+
+.PHONY: uninstall-mutator
+uninstall-mutator:
+	@-helm uninstall mutator
+
+.PHONY: uninstall-demo
+uninstall-demo:
+	@-helm uninstall demo
