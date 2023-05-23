@@ -19,6 +19,10 @@ containers:
       - --syslog-proto={{ required "proto is required" .Values.sideCar.syslog.proto }}
       - --cluster-name={{ .Values.cluster }}
       {{- end }}
+      {{- if .Values.minio.enabled }}
+      - --minio-enabled={{ .Values.minio.enabled }}
+      - "--minio-host={{ .Values.minio.server.host }}:{{ .Values.minio.server.port }}"
+      {{- end }}
     env:
       - name: POD_NAME
         valueFrom:

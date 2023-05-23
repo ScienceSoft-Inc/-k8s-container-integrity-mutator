@@ -52,6 +52,15 @@ helm-syslog:
 		--set service.port=$(SYSLOG_PORT) \
 		$(HELM_CHART_SYSLOG) --wait
 
+.PHONY: minio-install
+minio-install:
+	echo "Install Minio server"
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo update
+	helm upgrade -i minio --namespace=minio bitnami/minio --create-namespace \
+ 		--set defaultBuckets=integrity \
+ 		--wait
+
 .PHONY : tidy
 tidy: ## Cleans the Go module.
 	@echo "==> Tidying module"

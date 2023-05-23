@@ -101,3 +101,11 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# The MinIO connection data. It assumes that the MinIO server is running on and
+# properly configured.
+minio:
+  enabled: true
+  server:
+    host: minio.minio.svc.cluster.local # service.namespace.svc.cluster.local
+    port: "9000"
