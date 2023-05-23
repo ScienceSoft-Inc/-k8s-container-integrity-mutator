@@ -100,7 +100,6 @@ func (sc *SidecarConfig) ConfigFromAnnotations(annotations map[string]string) {
 			}
 		}
 		sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", monitoringOptsArg, strings.Join(opts, " ")))
-		// sc.Containers[i].Args = append(sc.Containers[i].Args, "--verbose=debug")
 
 		if annotation, ok := annotations[AnnotationProcessImage]; ok {
 			sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", processImageArg, annotation))

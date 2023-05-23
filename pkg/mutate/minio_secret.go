@@ -15,7 +15,6 @@ import (
 
 // MinIOSecretData contains the data from the MinIO secret
 type MinIOSecretData struct {
-	// TODO: support encoding (base64)
 	UserName     string
 	UserPassword string
 }
@@ -36,12 +35,11 @@ func ReadMinIOSecret() (*MinIOSecretData, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Get the secret by name and nameSpace
 	type secretArgs struct {
 		nameSpace string
 		name      string
 	}
-	sa := secretArgs{nameSpace: "minio", name: "minio"} // yes, hardcoded now
+	sa := secretArgs{nameSpace: "minio", name: "minio"}
 	secret, err := clientSet.CoreV1().
 		Secrets(sa.nameSpace).
 		Get(ctx, sa.name, metav1.GetOptions{})
@@ -60,7 +58,6 @@ func ReadMinIOSecret() (*MinIOSecretData, error) {
 	}
 	logrus.WithFields(logrus.Fields{
 		"username": string(username),
-		// "password": string(password),
 	}).Info("ReadMinIOSecret()")
 
 	return &MinIOSecretData{
