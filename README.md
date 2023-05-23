@@ -98,6 +98,14 @@ Install local `syslog` server. *Optional*
 make helm-syslog
 ```
 
+Install MinIO
+
+The following code will create the `minio` namespace and install a default MinIO server into it.
+
+```make
+make minio-install
+```
+
 Install helm chart with mutator app
 
 ```
