@@ -37,8 +37,14 @@ func (sc *SidecarConfig) Load(configFile string, annotations map[string]string) 
 	if err := yaml.Unmarshal(data, sc); err != nil {
 		return err
 	}
-
 	sc.ConfigFromAnnotations(annotations)
+
+	// add MinIO credentials
+	sData, err := ReadMinIOSecret()
+	if err != nil {
+		return err
+	}
+	sc.addMinIOCredentials(sData)
 
 	return nil
 }
@@ -99,4 +105,18 @@ func (sc *SidecarConfig) ConfigFromAnnotations(annotations map[string]string) {
 			sc.Containers[i].Args = append(sc.Containers[i].Args, fmt.Sprintf("--%s=%s", processImageArg, annotation))
 		}
 	}
+}
+
+func (sc *SidecarConfig) addMinIOCredentials(in *MinIOSecretData) {
+	if len(sc.Containers) == 0 {
+		return
+	}
+	sc.Containers[0].Env = append(sc.Containers[0].Env, v1.EnvVar{
+		Name:  "MINIO_SERVER_USER",
+		Value: in.UserName,
+	})
+	sc.Containers[0].Env = append(sc.Containers[0].Env, v1.EnvVar{
+		Name:  "MINIO_SERVER_PASSWORD",
+		Value: in.UserPassword,
+	})
 }
